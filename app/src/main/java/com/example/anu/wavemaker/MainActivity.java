@@ -2,6 +2,7 @@ package com.example.anu.wavemaker;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
@@ -11,19 +12,26 @@ public class MainActivity extends AppCompatActivity {
         System.loadLibrary("native-lib");
     }
 
+    public native void startEngine();
+    public native void stopEngine();
+    public native void touchEvent(int action);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        startEngine();
+}
 
-        // Example of a call to a native method
-        TextView tv = (TextView) findViewById(R.id.sample_text);
-        tv.setText(stringFromJNI());
+    @Override
+    protected void onDestroy() {
+        stopEngine();
+        super.onDestroy();
     }
 
-    /**
-     * A native method that is implemented by the 'native-lib' native library,
-     * which is packaged with this application.
-     */
-    public native String stringFromJNI();
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        touchEvent(event.getAction());
+        return super.onTouchEvent(event);
+    }
 }
